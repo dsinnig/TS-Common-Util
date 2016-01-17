@@ -1,0 +1,29 @@
+{
++------------------------------------------------------------------------------------------------------------------+
+| Position size calculator for FOREX   
+|                                               
+| Developed by D. Sinnig (Biiuse Consulting and Investments Inc
+|																	  
+|																	  
+|                                                                   
+| v1.0:                                                             
+| - Calculates position size based on max risk in $ and the stop loss level in pips                     
+| - derives currency from "Base Currency Of Setting" for Strategies
+| - for Indicators it uses the second pair of the forex cross to determine the corrency (e.g., CAD for USDCAD)    
++------------------------------------------------------------------------------------------------------------------+
+}
+
+inputs: balance(numericsimple), balanceRiskInPercent(numericsimple), stopLossInPips(numericsimple);
+
+vars: positionSize(0), dollarPerMicroPip(0), microPip(0);
+
+If (GetExchangeName = "FOREX") then begin
+	microPip = MinMove / PriceScale;
+	dollarPerMicroPip = microPip * Bigpointvalue * LossCF;
+	positionSize = Round(balance * (balanceRiskInPercent * 0.01) / dollarPerMicroPip / stopLossInPips, 0);
+	
+	_Biiuse_getPositionSize = positionSize;
+end else begin
+	Print ("Function only works for Forex");
+	_Biiuse_getPositionSize = 0;
+end;
